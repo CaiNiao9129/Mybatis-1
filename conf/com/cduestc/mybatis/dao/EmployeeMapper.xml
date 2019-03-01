@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.cduestc.mybatis.dao.EmployeeMapper">
+ 	<!-- 命名空间 ;指定为接口的全类名,使得接口与配置文件进行动态绑定
+ 	
+ 	id：唯一标识
+ 	resultType：返回值类型
+ 	#{id}:传递过来的参数中取出id值
+ 	-->
+ 	<!--根据mysql数据库厂商驱动来查询  -->
+ 	<select id="getEmployeeById" resultType="employee"
+ 		databaseId="mysql">
+		select * from tbl_employee where id = #{id}; 	
+ 	</select>
+ 	
+ 	<!-- public void addEmp(Employee employee); 
+ 		useGeneratedKeys="true" 使用自增主键获取主键策略
+ 		keyProperty:指定对应的主键属性。也就是mybatis获取主键值以后，将这个值封装给javaBean的哪个属性
+ 		-->
+ 	<insert id="addEmp" parameterType="com.cduestc.mybatis.Employee" 
+ 	useGeneratedKeys="true" keyProperty="id">
+ 		insert into tbl_employee(last_name,email,gender)
+ 		values(#{lastname},#{email},#{gender});
+ 	</insert>
+ 	
+ 	<!-- public void updateEmp(Employee employee); -->
+ 	<update id="updateEmp">
+ 		update tbl_employee
+ 			set last_name=#{lastname},email=#{email},gender=#{gender}
+ 			where id = #{id}
+ 	</update>
+ 	
+ 	<!-- public void deleteEmpById(Integer id); -->
+ 	<delete id="deleteEmpById">
+ 		delete from tbl_employee where id = #{id};
+ 	</delete>
+	
+ 	<!--根据oracle数据库厂商驱动来实现  -->
+ 	<select id="getEmployeeById" resultType="employee" 
+ 		databaseId="oracle">
+ 		select * from employee where id = #{id};
+ 	</select>
+ 	<!--  如果返回是一个集合，要集合元素的类型-->
+ 	<select id="getEmpsBylastNameLike" resultType="com.cduestc.mybatis.Employee">
+ 			select * from tbl_employee where last_name like #{lastname};
+ 	</select>
+ 	<select id="getEmpsByIdReturnMap" resultType="map">
+ 		select * from tbl_employee where id = #{id};
+ 	</select>
+ 	<select id="getEmpsByLastNameLikeReturnMap" resultType="com.cduestc.mybatis.Employee">
+ 		select * from tbl_employee where last_name like #{lastname};
+ 	</select>
+ </mapper>

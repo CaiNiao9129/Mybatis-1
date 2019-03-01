@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-config.dtd">
+ 
+ <configuration>
+ <!--properties标签:
+ 	1:mybatis可以使用properties来引入properties配置文件的内容  -->
+ 	
+ 	<properties resource="db.properties"></properties>
+ 	<!-- 驼峰命名法 -->
+ 	<settings>
+ 		<setting name="mapUnderscoreToCamelCase" value="true"></setting>
+ 	</settings>
+ 	<!--别名处理器 ：typeAlias：为某一个java类型起别名
+ 		type：指定要起别名的类型全类名，默认别名就是类名小写：employee
+ 		alais：指定新的别名
+ 		package：给包起别名，别名不区分大小写
+ 			 -->
+ 	<typeAliases>
+ 		<typeAlias type="com.cduestc.mybatis.Employee" alias="employee"/>
+	 	<package name="com.cduestc.mybatis"/>
+ 	</typeAliases>	
+ 	 <!-- 为某个包下的所有类批量起别名 
+ 	 		name:指定包名
+ 	 -->
+ 	 <!--  default:是指定的环境，mybatis可以有多个环境，根据<environment id=来区别多个environment，default后就指定多个环境中的哪一个
+ 	 -->
+ 	<environments default="develop_mysql">
+ 	
+ 		<environment id="test">
+ 		<transactionManager type="MANAGED"/>
+ 			<dataSource type="POOLED">
+ 					<property name="driver" value="${jdbc.driverClass}"/>
+ 					<property name="url" value="${jdbc.jdbcUrl}"/>
+ 					<property name="username" value="${jdbc.user}"/>
+ 					<property name="password" value="${jdbc.password}"/>
+ 			</dataSource>
+ 		</environment>
+ 		
+ 		<environment id="develop_mysql">
+ 		<!-- 事务管理器transactionManager：有俩种：1：jdbc 2：MANAGED,type指定哪一种事务管理器  -->
+ 			<transactionManager type="JDBC"/>
+ 			<!--DataSource：数据源 ,mybatis 默认的数据源 type有三种：1:JNDI(JndiDataSourceFactory) 2：POOLED(PooledDataSourceFactory) 3：UNPOOLED(UnpooledDataSourceFactory)  -->
+ 			<!-- 可以自定义数据源：实现DataSourceFactory接口 -->
+ 			<dataSource type="POOLED">
+ 					<property name="driver" value="${jdbc.driverClass}"/>
+ 					<property name="url" value="${jdbc.jdbcUrl}"/>
+ 					<property name="username" value="${jdbc.user}"/>
+ 					<property name="password" value="${jdbc.password}"/>
+ 			</dataSource>
+ 		</environment>
+ 		<!-- Oracle的事务管理器配置 -->
+ 		<environment id="develop_oracle">
+ 		<transactionManager type="JDBC"/>
+ 			<dataSource type="POOLED">
+ 					<property name="driver" value="${orcl.driverClass}"/>
+ 					<property name="url" value="${orcl.jdbcUrl}"/>
+ 					<property name="username" value="${orcl.user}"/>
+ 					<property name="password" value="${orcl.password}"/>
+ 			</dataSource>
+ 		</environment>
+ 	</environments>
+ 	<!--支持多数据库厂商  type="DB_VENDOR作用就是得到数据库厂商的标识,(驱动getDatabaseProductName())-->
+ 	<databaseIdProvider type="DB_VENDOR">
+ 	<!--为不同的数据厂商起别名  具体实现将在SQL语句的配置文件中用databaseId具体指定-->
+ 		<property name="MySql" value="mysql"/>
+ 		<property name="Oracle" value="oracle"/>
+ 	</databaseIdProvider>
+ 	
+ <!-- 将我们写好的sql映射文件(EmployeeMapper.xml)一定要注册到全局配置文件中 -->
+ 	<!-- mapper:注册一个 sql映射：
+ 		resource：：引入类路径下的sql映射文件
+ 		url：引用网路路径或者磁盘路径下的sql映射文件
+ 		class:引用接口
+ 			1：有sql映射文件，映射文件必须与接口同名，并且放在与接口同一目录下
+ 			2：没有sql映射文件，所有的sql都是利用注解写在接口上
+ 	-->
+ 	<mappers>
+ 	<!-- 
+ 		<mapper resource="mybatis/mapper/EmployeeMapper.xml"/>
+ 		<mapper resource="mybatis/mapper/EmployeeMapperPlus.xml"/>
+ 		<mapper resource="mybatis/mapper/DepartmentMapper.xml"/>
+ 		<mapper class="com.cduestc.mybatis.dao.EmployeeMapperAnnoation"/>
+ 		 -->
+ 		<!-- 批量注册 -->
+ 		<package name="com.cduestc.mybatis.dao"/>
+ 		
+ 	</mappers>
+ </configuration>
+ 
+ 

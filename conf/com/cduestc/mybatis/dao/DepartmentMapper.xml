@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.cduestc.mybatis.dao.DepartmentMapper">
+	<select id="getDeptById" resultType="com.cduestc.mybatis.Department">
+		select * from tbl_department where did = #{d_id};
+	</select>
+	
+	<resultMap type="com.cduestc.mybatis.Department" id="MyDept">
+		<id column="did" property="did"/>
+		<result column="dept_name" property="deptName"/>
+		<!-- collection定义关联集合类型的属性的封装规则 -->
+		<collection property="emps" ofType="com.cduestc.mybatis.Employee">
+			<!-- 定义这个集合元素的封装规则 -->
+			<id column="id" property="id"/>
+			<result column="last_name" property="lastname"/>
+			<result column="email" property="email"/>
+			<result column="gender" property="gender"/>
+			<association property="dept" 
+	 			select="com.cduestc.mybatis.dao.DepartmentMapper.getDeptById" 
+	 			column="d_id">
+ 			</association>
+		</collection>
+	</resultMap>	
+	<select id="getDeptByIdPlus" resultMap="MyDept">
+		select * from tbl_department d,tbl_employee e where d.did = e.d_id and d.did = #{did};
+	</select>
+	
+	<resultMap type="com.cduestc.mybatis.Employee" id="CheckEmp">
+		<id column="id" property="id"/>
+		<result column="last_name" property="lastName"/>
+		<result column="email" property="email"/>
+		<result column="gender" property="gender"/>
+		<!-- discriminator 鉴别器：mybatis可以使用discriminator判断某列的值，
+		然后根据某一列的值改变封装行为 -->
+		<discriminator javaType="string" column="gender">
+			<case value="0" resultType="com.cduestc.mybatis.Employee">
+				<association property="dept"
+					select="com.cduestc.mybatis.DepartmentMapper.getDeptById"
+					column="d_id">
+				</association>
+			</case>
+			<case value="1" resultType="com.cduestc.mybatis.Employee">
+				<id column="id" property="id"/>
+				<result column="last_name" property="lastname"/>
+			</case>
+		</discriminator>
+	</resultMap>
+</mapper>

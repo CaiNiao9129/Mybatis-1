@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.cduestc.mybatis.dao.EmployeeMapperPlus">
+ 
+ <!-- resultMap:可以指定自定义结果集映射规则
+ 	type:自定规则的java类型 -->
+ 	<resultMap type="com.cduestc.mybatis.Employee" id="MyEmp">
+ 		<!-- 指定主键列的封装规则 
+ 			column:指定哪一列，
+ 			property：指定对应javaBean属性
+ 			联合查询：级联属性封装结果集;
+ 			-->
+ 			
+ 		<id column="id" property="id"/>
+ 		<result column="last_name" property="lastname"/>
+ 		<result column="email" property="email"/>
+ 		<result column="gender" property="gender"/>
+ 		<result column="did" property="dept.did"/>
+ 		<result column="dept_name" property="dept.departName"/>
+ 	</resultMap>
+ 	
+ 	<resultMap type="com.cduestc.mybatis.Employee" id="MyEmp2">
+ 		<id column="id" property="id"/>
+ 		<result column="last_name" property="lastname"/>
+ 		<result column="email" property="email"/>
+ 		<result column="gender" property="gender"/>
+ 		<!-- association可以指定联合的javaBean对象 
+ 			property="dept"指定哪个属性时联合的对象
+ 			javaType:指定这个属性对象的类型
+ 		-->
+ 		<association property="dept" javaType="com.cduestc.mybatis.Department">
+	 		<id column="did" property="did"/>
+	 		<result column="dept_name" property="departName"/>
+ 		</association>
+ 	</resultMap>
+ 	
+ 	<select id="getEmployeeById" resultMap="MyEmp"
+ 		databaseId="mysql">
+		select * from tbl_employee where id = #{id}; 	
+ 	</select>
+ 	
+ 	<select id="getEmpAndDept" resultMap="MyEmp2">
+ 		select * from tbl_employee e,tbl_department d where e.d_id = d.did and e.id = #{id};
+ 	</select>
+ 	
+ 	<!--用association分步查询 
+ 		1:先按照id查询员工信息
+ 		2：根据查询员工信息中的d_id值去查出部门
+ 	 -->
+ 	<resultMap type="com.cduestc.mybatis.Employee" id="MyEmpByStep">
+ 		<id column="id" property="id"/>
+ 		<result column="last_name" property="lastname"/>
+ 		<result column="email" property="email"/>
+ 		<result column="gender" property="gender"/>
+ 		<!--  这里的select是表明当前属性dept的来源-->
+ 		<association property="dept" 
+ 			select="com.cduestc.mybatis.dao.DepartmentMapper.getDeptById" 
+ 			column="d_id">
+ 		</association>
+ 	</resultMap>
+ 	
+ 	<select id="getEmpByIdStep" resultMap="MyEmpByStep">
+		select * from tbl_employee where id = #{id}; 	
+ 	</select>
+ 	<!-- 查询部门把部门下的所有员工 显示出来 -->
+ 
+ </mapper>
